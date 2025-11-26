@@ -5,11 +5,9 @@
 import datetime
 import os
 import json
-import math
 import shutil
 import time
 import subprocess
-
 import matplotlib.pyplot
 import matplotlib
 
@@ -18,8 +16,8 @@ from elikopy.individual_subject_processing import (preproc_solo, dti_solo,
     white_mask_solo, noddi_solo, diamond_solo, mf_solo, noddi_amico_solo,
     ivim_solo, odf_csd_solo, odf_msmtcsd_solo, tracking_solo, sift_solo,
     verdict_solo, clean_study_solo)
-
-from elikopy.utils import submit_job, get_job_state, makedir, tbss_utils, regall_FA, regall, randomise_all
+from elikopy.utils import (submit_job, get_job_state, makedir, tbss_utils,
+                           regall_FA, regall, randomise_all)
 
 
 def dicom_to_nifti(folder_path):
@@ -145,7 +143,6 @@ class Elikopy:
                             name = os.path.splitext(os.path.splitext(file)[0])[0]
                             bvec = os.path.splitext(os.path.splitext(file)[0])[0] + ".bvec"
                             bval = os.path.splitext(os.path.splitext(file)[0])[0] + ".bval"
-                            jsonpath = os.path.splitext(os.path.splitext(file)[0])[0] + ".json"
 
                         anat_path = bids_path + "/" + subj + "/anat/" + name + "_T1w.nii.gz"
 
@@ -376,7 +373,7 @@ class Elikopy:
                                     output = subprocess.check_output(fslroi_cmd, universal_newlines=True,
                                                                      shell=True, stderr=subprocess.STDOUT)
                                     print(output)
-                                except subprocess.CalledProcessError as e:
+                                except subprocess.CalledProcessError:
                                     print(f"Error extracting b0 volume at index {b0_idx}")
                                     exit()
 
@@ -656,7 +653,7 @@ class Elikopy:
 
             shutil.rmtree(folder_path + '/eddy_squad', ignore_errors=True)
             bashCommand = 'export OMP_NUM_THREADS='+str(core_count)+' ; export FSLPARALLEL='+str(core_count)+' ; eddy_squad "' + dest_list + '" --update -o ' + folder_path + '/eddy_squad'
-            bashcmd = bashCommand.split()
+            # bashcmd = bashCommand.split()
             process = subprocess.Popen(bashCommand, universal_newlines=True, shell=True)
             output, error = process.communicate()
 
@@ -676,7 +673,7 @@ class Elikopy:
                     shutil.copyfile(
                         folder_path + '/subjects/' + patient_path + '/dMRI/preproc/quality_control/qc_report.pdf',
                         folder_path + '/subjects/' + patient_path + '/quality_control.pdf')
-        else:
+        elif report:
             for p in patient_list:
                 patient_path = p
                 shutil.copyfile(
@@ -880,8 +877,6 @@ class Elikopy:
         slurm = self._slurm if slurm is None else slurm
         slurm_email = self._slurm_email if slurm_email is None else slurm_email
 
-        import os.path
-
         assert maskType in ["brain_mask_dilated", "brain_mask", "wm_mask_MSMT", "wm_mask_AP", "wm_mask_FSL_T1",
                             "wm_mask_Freesurfer_T1"], "The mask parameter must be one of the following : brain_mask_dilated, brain_mask, wm_mask_MSMT, wm_mask_AP, wm_mask_FSL_T1, wm_mask_Freesurfer_T1"
 
@@ -960,8 +955,6 @@ class Elikopy:
         folder_path = self._folder_path if folder_path is None else folder_path
         slurm = self._slurm if slurm is None else slurm
         slurm_email = self._slurm_email if slurm_email is None else slurm_email
-
-        import os.path
 
         assert maskType in ["brain_mask_dilated", "brain_mask"], "maskType must be either brain_mask_dilated or brain_mask"
 
@@ -1042,8 +1035,6 @@ class Elikopy:
         folder_path = self._folder_path if folder_path is None else folder_path
         slurm = self._slurm if slurm is None else slurm
         slurm_email = self._slurm_email if slurm_email is None else slurm_email
-
-        import os.path
 
 
         f=open(folder_path + "/logs.txt", "a+")
