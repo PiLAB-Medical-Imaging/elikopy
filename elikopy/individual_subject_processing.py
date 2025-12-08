@@ -375,7 +375,7 @@ def preproc_solo(folder_path, p, reslice=False, reslice_addSlice=False, denoisin
                     output = subprocess.check_output(fslroi_cmd, universal_newlines=True,
                                                      shell=True, stderr=subprocess.STDOUT)
                     print(output)
-                except subprocess.CalledProcessError as e:
+                except subprocess.CalledProcessError:
                     print(f"Error extracting b0 volume at index {b0_idx}")
                     exit()
 
@@ -388,7 +388,7 @@ def preproc_solo(folder_path, p, reslice=False, reslice_addSlice=False, denoisin
                 output = subprocess.check_output(merge_b0_cmd, universal_newlines=True, shell=True,
                                                  stderr=subprocess.STDOUT)
                 print(output)
-            except subprocess.CalledProcessError as e:
+            except subprocess.CalledProcessError:
                 print("Error when merging b0 volumes")
                 exit()
 
@@ -406,7 +406,7 @@ def preproc_solo(folder_path, p, reslice=False, reslice_addSlice=False, denoisin
                 output = subprocess.check_output(merge_b0_cmd, universal_newlines=True, shell=True,
                                                  stderr=subprocess.STDOUT)
                 print(output)
-            except subprocess.CalledProcessError as e:
+            except subprocess.CalledProcessError:
                 print("Error when merging b0 volumes with the original DW-MRI")
                 exit()
 
@@ -1936,11 +1936,6 @@ def white_mask_solo(folder_path, p, maskType, corr_gibbs=True, core_count=1, deb
             print("[" + log_prefix + "] " + datetime.datetime.now().strftime(
                 "%d.%b %Y %H:%M:%S") + ": End of gibbs for patient %s \n" % p)
 
-        if corr_gibbs:
-            input_bet_path = corrected_gibbs_path
-        else:
-            input_bet_path = anat_path
-
         # anat_path = folder_path + '/anat/' + patient_path + '_T1.nii.gz'
         brain_extracted_T1_path = folder_path + '/subjects/' + patient_path + "/T1/" + patient_path + '_T1_brain.nii.gz'
         wm_log.close()
@@ -2642,7 +2637,6 @@ def diamond_solo(folder_path, p, core_count=4, reportOnly=False, maskType="brain
         else:
             bashCommand = bashCommand + customDiamond
 
-        bashcmd = bashCommand.split()
         print("[" + log_prefix + "] " + datetime.datetime.now().strftime(
             "%d.%b %Y %H:%M:%S") + ": crlDCIEstimate launched for patient %s \n" % p + " with bash command " + bashCommand)
         f = open(folder_path + '/subjects/' + patient_path + "/dMRI/microstructure/diamond/diamond_logs.txt", "a+")
@@ -3800,7 +3794,6 @@ def sift_solo(folder_path: str, p: str, streamline_number: int = 100000,
                          + "_CSD_SH_ODF_mrtrix.nii.gz")
 
     tracking_path = folder_path + '/subjects/' + patient_path + "/dMRI/tractography/"
-    mask_path = folder_path + '/subjects/' + patient_path + '/masks/' + patient_path + "_brain_mask_dilated.nii.gz"
     dwi_path = folder_path + '/subjects/' + patient_path + '/dMRI/preproc/' + patient_path + '_dmri_preproc.nii.gz'
 
     input_file = tracking_path+patient_path+'_'+input_filename+'.tck'
