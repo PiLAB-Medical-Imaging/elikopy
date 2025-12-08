@@ -383,7 +383,7 @@ class Elikopy:
                                 output = subprocess.check_output(merge_b0_cmd, universal_newlines=True, shell=True,
                                                                  stderr=subprocess.STDOUT)
                                 print(output)
-                            except subprocess.CalledProcessError as e:
+                            except subprocess.CalledProcessError:
                                 print("Error when merging b0 volumes")
                                 exit()
 
@@ -938,13 +938,18 @@ class Elikopy:
         f.write("["+log_prefix+"] " + datetime.datetime.now().strftime("%d.%b %Y %H:%M:%S") + ": End of ODF CSD\n")
         f.close()
 
-    def odf_msmtcsd(self, folder_path=None, num_peaks = 2, peaks_threshold=0.25, maskType="brain_mask_dilated", slurm=None, patient_list_m=None, slurm_email=None, slurm_timeout=None, cpus=None, slurm_mem=None):
-        """Computes the odf using MSMT-CSD for each subject. The outputs are available in the directories <folder_path>/subjects/<subjects_ID>/dMRI/ODF/MSMT-CSD/.
+    def odf_msmtcsd(self, folder_path=None, num_peaks = 2, peaks_threshold=0.25,
+                    maskType="brain_mask_dilated", tempdir:str='$HOME',
+                    slurm=None, patient_list_m=None, slurm_email=None,
+                    slurm_timeout=None, cpus=None, slurm_mem=None):
+        """Computes the odf using MSMT-CSD for each subject. The outputs are available
+        in the directories <folder_path>/subjects/<subjects_ID>/dMRI/ODF/MSMT-CSD/.
 
         example : study.odf_msmtcsd()
 
         :param folder_path: the path to the root directory. default=study_folder
         :param patient_list_m: Define a subset of subjects to process instead of all the available subjects. example : ['patientID1','patientID2','patientID3']. default=None
+        :param tempdir: Manually specify the path in which to generate the temporary directory.
         :param slurm: Whether to use the Slurm Workload Manager or not (for computer clusters). default=value_during_init
         :param slurm_email: Email adress to send notification if a task fails. default=None
         :param slurm_timeout: Replace the default slurm timeout of 20h by a custom timeout.
@@ -981,7 +986,7 @@ class Elikopy:
 
             if slurm:
                 p_job = {
-                        "wrap": "export MKL_NUM_THREADS="+ str(core_count)+" ; export OMP_NUM_THREADS="+ str(core_count)+" ; python -c 'from elikopy.individual_subject_processing import odf_msmtcsd_solo; odf_msmtcsd_solo(\"" + folder_path + "/\",\"" + p + "\", num_peaks =" + str(num_peaks) + ", core_count=" + str(core_count) + ", maskType=\"" + str(maskType) + "\", peaks_threshold="+ str(peaks_threshold) + ")'",
+                        "wrap": "export MKL_NUM_THREADS="+ str(core_count)+" ; export OMP_NUM_THREADS="+ str(core_count)+" ; python -c 'from elikopy.individual_subject_processing import odf_msmtcsd_solo; odf_msmtcsd_solo(\"" + folder_path + "/\",\"" + p + "\", num_peaks =" + str(num_peaks) + ", core_count=" + str(core_count) + ", maskType=\"" + str(maskType) + "\", tempdir=\"" + str(tempdir) + "\", peaks_threshold="+ str(peaks_threshold) + ")'",
                         "job_name": "MSMTCSD_" + p,
                         "ntasks": 1,
                         "cpus_per_task": core_count,
@@ -2241,10 +2246,8 @@ class Elikopy:
         if patient_list_m:
             patient_list = patient_list_m
 
-        job_list = []
         f = open(folder_path + "/logs.txt", "a+")
         for p in patient_list:
-            patient_path = p
 
             fintra_path = folder_path + "/subjects/" + p + "/dMRI/microstructure/noddi/" + p + "_noddi_fintra.nii.gz"
             fbundle_path = folder_path + "/subjects/" + p + "/dMRI/microstructure/noddi/" + p + "_noddi_fbundle.nii.gz"
