@@ -3346,7 +3346,8 @@ def odf_csd_solo(folder_path, p, num_peaks=2, peaks_threshold = .25, CSD_bvalue=
     update_status(folder_path, patient_path, "odf_csd")
 
 
-def odf_msmtcsd_solo(folder_path, p, core_count=1, num_peaks=2, peaks_threshold = 0.25, report=True, maskType="brain_mask_dilated"):
+def odf_msmtcsd_solo(folder_path, p, core_count=1, num_peaks=2, peaks_threshold = 0.25,
+                     report=True, maskType="brain_mask_dilated", tempdir:str='$HOME'):
     """Perform MSMT CSD odf computation and store the data in the <folder_path>/subjects/<subjects_ID>/dMRI/ODF/MSMT-CSD/.
 
     :param folder_path: the path to the root directory.
@@ -3366,14 +3367,16 @@ def odf_msmtcsd_solo(folder_path, p, core_count=1, num_peaks=2, peaks_threshold 
     odf_msmtcsd_path = folder_path + '/subjects/' + patient_path + "/dMRI/ODF/MSMT-CSD"
     makedir(odf_msmtcsd_path, folder_path + '/subjects/' + patient_path + "/dMRI/ODF/MSMT-CSD/MSMT-CSD_logs.txt", log_prefix)
 
-    dwi2response_cmd = 'dwi2response dhollander -info ' + \
-                       '-nthreads ' + str(core_count) + '  -fslgrad ' + \
-                       folder_path + '/subjects/' + patient_path + '/dMRI/preproc/' + patient_path + "_dmri_preproc.bvec " + \
-                       folder_path + '/subjects/' + patient_path + '/dMRI/preproc/' + patient_path + "_dmri_preproc.bval " + \
-                       folder_path + '/subjects/' + patient_path + '/dMRI/preproc/' + patient_path + "_dmri_preproc.nii.gz " + \
-                       odf_msmtcsd_path + '/' + patient_path + '_dhollander_WM_response.txt ' + \
-                       odf_msmtcsd_path + '/' + patient_path + '_dhollander_GM_response.txt ' + \
-                       odf_msmtcsd_path + '/' + patient_path + '_dhollander_CSF_response.txt -force ; '
+    dwi2response_cmd = ('dwi2response dhollander -info ' +
+                       '-nthreads ' + str(core_count) + '  -fslgrad ' +
+                       folder_path + '/subjects/' + patient_path + '/dMRI/preproc/' + patient_path + "_dmri_preproc.bvec " +
+                       folder_path + '/subjects/' + patient_path + '/dMRI/preproc/' + patient_path + "_dmri_preproc.bval " +
+                       folder_path + '/subjects/' + patient_path + '/dMRI/preproc/' + patient_path + "_dmri_preproc.nii.gz " +
+                       odf_msmtcsd_path + '/' + patient_path + '_dhollander_WM_response.txt ' +
+                       odf_msmtcsd_path + '/' + patient_path + '_dhollander_GM_response.txt ' +
+                       odf_msmtcsd_path + '/' + patient_path + '_dhollander_CSF_response.txt '+
+                       '-tempdir '+tempdir+' '
+                       '-force ; ')
 
     dwi2fod_cmd = 'dwi2fod msmt_csd -info ' + \
                   '-nthreads ' + str(core_count) + ' -mask ' + \
