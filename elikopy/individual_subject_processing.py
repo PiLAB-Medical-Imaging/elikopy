@@ -3375,7 +3375,7 @@ def odf_msmtcsd_solo(folder_path, p, core_count=1, num_peaks=2, peaks_threshold 
                        odf_msmtcsd_path + '/' + patient_path + '_dhollander_WM_response.txt ' +
                        odf_msmtcsd_path + '/' + patient_path + '_dhollander_GM_response.txt ' +
                        odf_msmtcsd_path + '/' + patient_path + '_dhollander_CSF_response.txt '+
-                       '-tempdir '+tempdir+' '
+                       '-tempdir '+tempdir+'/ '
                        '-force ; ')
 
     dwi2fod_cmd = 'dwi2fod msmt_csd -info ' + \
