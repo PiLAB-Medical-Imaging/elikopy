@@ -3694,8 +3694,10 @@ def ivim_solo(folder_path, p, core_count=1, G1Ball_2_lambda_iso=7e-9, G1Ball_1_l
 def tracking_solo(folder_path: str, p: str, streamline_number: int = 100000,
                   max_angle: int = 15, cutoff: float = 0.1, msmtCSD: bool = True,
                   output_filename: str = 'tractogram', core_count: int = 1,
-                  maskType: str = "brain_mask", save_as_trk: bool = False):
-    """ Computes the whole brain tractogram of a single patient based on the fod obtained from msmt-CSD.
+                  maskType: str = "brain_mask", save_as_trk: bool = False,
+                  output_dir: str = None):
+    """ Computes the whole brain tractogram of a single patient based on the
+    fod obtained from msmt-CSD.
 
     :param folder_path: the path to the root directory.
     :param p: The name of the patient.
@@ -3733,10 +3735,14 @@ def tracking_solo(folder_path: str, p: str, streamline_number: int = 100000,
             out.to_filename(folder_path + '/subjects/' + patient_path + "/dMRI/ODF/CSD/"+patient_path + "_CSD_SH_ODF_mrtrix.nii.gz")
         odf_file_path = folder_path + '/subjects/' + patient_path + "/dMRI/ODF/CSD/"+patient_path + "_CSD_SH_ODF_mrtrix.nii.gz"
         params['Local modeling']='CSD'
-    tracking_path = folder_path + '/subjects/' + patient_path + "/dMRI/tractography/"
     seed_path = folder_path + '/subjects/' + patient_path + '/masks/' + patient_path + "_brain_mask.nii.gz"
     mask_path = folder_path + '/subjects/' + patient_path + '/masks/' + patient_path + '_' + maskType + '.nii.gz'
     dwi_path = folder_path + '/subjects/' + patient_path + '/dMRI/preproc/' + patient_path + '_dmri_preproc.nii.gz'
+    
+    if output_dir is None or output_dir=="None":
+        tracking_path = folder_path + '/subjects/' + patient_path + "/dMRI/tractography/"
+    else:
+        tracking_path = output_dir
     
     output_file = tracking_path+patient_path+'_'+output_filename+'.tck'
 
