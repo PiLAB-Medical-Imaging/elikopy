@@ -3778,7 +3778,7 @@ def tracking_solo(folder_path: str, p: str, streamline_number: int = 100000,
 
 def sift_solo(folder_path: str, p: str, streamline_number: int = 100000,
               msmtCSD: bool = True, input_filename: str = 'tractogram',
-              core_count: int = 1, save_as_trk=False):
+              core_count: int = 1, save_as_trk=False, sift2: bool = False):
     """ Computes the sifted whole brain tractogram of a single patient based on
     the fod obtained from msmt-CSD.
 
@@ -3807,12 +3807,20 @@ def sift_solo(folder_path: str, p: str, streamline_number: int = 100000,
 
     input_file = tracking_path+patient_path+'_'+input_filename+'.tck'
     output_file = tracking_path+patient_path+'_'+input_filename+'_sift.tck'
+    cmd = 'tcksift'
+    if sift2:
+        cmd+='2'
+        output_file = output_file[:-4]+'2.txt'
 
-    bashCommand = ('tcksift ' + input_file + ' ' + odf_file_path + ' ' +
+    bashCommand = (cmd + ' ' + input_file + ' ' + odf_file_path + ' ' +
                    output_file +
                    ' -nthreads ' + str(core_count) +
-                   ' -term_number ' + str(streamline_number) +
                    ' -force')
+    
+    if sift2:
+        bashCommand+=(' -out_mu '+output_file[:-4]+'_mu.txt')
+    else:
+        bashCommand+=(' -term_number ' + str(streamline_number))
 
     sift_log = open(tracking_path+"sift_logs.txt", "a+")
     process = subprocess.Popen(bashCommand, universal_newlines=True, shell=True,
