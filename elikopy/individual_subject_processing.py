@@ -3773,7 +3773,8 @@ def tracking_solo(folder_path: str, p: str, streamline_number: int = 100000,
     with open(output_file[:-3]+'json', 'w') as outfile:
         json.dump(params, outfile)
 
-    update_status(folder_path, patient_path, "tracking")
+    if output_dir is None or output_dir=="None":
+        update_status(folder_path, patient_path, "tracking")
 
 
 def sift_solo(folder_path: str, p: str, streamline_number: int = 100000,
