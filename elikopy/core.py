@@ -1064,8 +1064,11 @@ class Elikopy:
         for p in patient_list:
             patient_path = p
 
-            mf_path = folder_path + '/subjects/' + patient_path + "/dMRI/tractography"
-            makedir(mf_path,folder_path + '/subjects/' + patient_path+"/dMRI/tractography/tractography_logs.txt",log_prefix)
+            if output_dir is None:
+                out_path = folder_path + '/subjects/' + patient_path + "/dMRI/tractography"
+            else:
+                out_path = output_dir
+            makedir(out_path, out_path +"/tractography_logs.txt",log_prefix)
 
             if slurm:
                 p_job = {
@@ -1077,8 +1080,8 @@ class Elikopy:
                         "time": "00:25:00",
                         "mail_user": slurm_email,
                         "mail_type": "FAIL",
-                        "output": folder_path + '/subjects/' + patient_path + "/dMRI/tractography/slurm-%j.out",
-                        "error": folder_path + '/subjects/' + patient_path + "/dMRI/tractography/slurm-%j.err",
+                        "output": out_path + "/slurm-%j.out",
+                        "error": out_path + "/slurm-%j.err",
                     }
                 p_job["time"] = p_job["time"] if slurm_timeout is None else slurm_timeout
                 p_job["mem_per_cpu"] = p_job["mem_per_cpu"] if slurm_mem is None else slurm_mem
@@ -1106,6 +1109,7 @@ class Elikopy:
         f=open(folder_path + "/logs.txt", "a+")
         f.write("["+log_prefix+"] " + datetime.datetime.now().strftime("%d.%b %Y %H:%M:%S") + ": End of tractography\n")
         f.close()
+
         
     def sift(self, folder_path=None, streamline_number: int = 100000, sift2: bool = False,
              msmtCSD: bool = True, input_filename: str = "tractogram", save_as_trk = False,
