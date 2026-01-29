@@ -1107,7 +1107,7 @@ class Elikopy:
         f.write("["+log_prefix+"] " + datetime.datetime.now().strftime("%d.%b %Y %H:%M:%S") + ": End of tractography\n")
         f.close()
         
-    def sift(self, folder_path=None, streamline_number: int = 100000,
+    def sift(self, folder_path=None, streamline_number: int = 100000, sift2: bool = False,
              msmtCSD: bool = True, input_filename: str = "tractogram", save_as_trk = False,
              slurm = None, patient_list_m = None, slurm_email = None,
              slurm_timeout = None, cpus = None, slurm_mem = None):
@@ -1156,7 +1156,7 @@ class Elikopy:
 
             if slurm:
                 p_job = {
-                        "wrap": "export MKL_NUM_THREADS="+ str(core_count)+" ; export OMP_NUM_THREADS="+ str(core_count)+" ; python -c 'from elikopy.individual_subject_processing import sift_solo; sift_solo(\"" + folder_path + "/\",\"" + p + "\", streamline_number =" + str(streamline_number) + ", msmtCSD=" + str(msmtCSD) + ", core_count=" + str(core_count) + ", save_as_trk=" + str(save_as_trk) + ", input_filename= \"" + input_filename + "\"" + ")'",
+                        "wrap": "export MKL_NUM_THREADS="+ str(core_count)+" ; export OMP_NUM_THREADS="+ str(core_count)+" ; python -c 'from elikopy.individual_subject_processing import sift_solo; sift_solo(\"" + folder_path + "/\",\"" + p + "\", streamline_number =" + str(streamline_number) + ", msmtCSD=" + str(msmtCSD) + ", sift2=" + str(sift2) + ", core_count=" + str(core_count) + ", save_as_trk=" + str(save_as_trk) + ", input_filename= \"" + input_filename + "\"" + ")'",
                         "job_name": "SIFT_" + p,
                         "ntasks": 1,
                         "cpus_per_task": core_count,
@@ -1176,7 +1176,7 @@ class Elikopy:
                 f.write("["+log_prefix+"] " + datetime.datetime.now().strftime("%d.%b %Y %H:%M:%S") + ": Patient %s is ready to be processed\n" % p)
                 f.write("["+log_prefix+"] " + datetime.datetime.now().strftime("%d.%b %Y %H:%M:%S") + ": Successfully submited job %s using slurm\n" % p_job_id)
             else:
-                sift_solo(folder_path + "/", p,  streamline_number=streamline_number, msmtCSD=msmtCSD, input_filename=input_filename, core_count=core_count, save_as_trk=save_as_trk)
+                sift_solo(folder_path + "/", p,  streamline_number=streamline_number, msmtCSD=msmtCSD, input_filename=input_filename, core_count=core_count, save_as_trk=save_as_trk, sift2=sift2)
                 matplotlib.pyplot.close(fig='all')
                 f.write("["+log_prefix+"] " + datetime.datetime.now().strftime("%d.%b %Y %H:%M:%S") + ": Successfully applied sift_solo on patient %s\n" % p)
                 f.flush()
